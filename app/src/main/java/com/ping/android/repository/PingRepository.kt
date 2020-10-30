@@ -3,14 +3,22 @@ package com.ping.android.repository
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
+import com.ping.android.application.PingApplication
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.flow.flow
 import java.lang.Thread.sleep
 import java.net.InetAddress
 import java.net.Socket
 import java.net.URL
+import javax.inject.Inject
 
 
-class PingRepository(private val context: Context) {
+@Module
+@InstallIn(ActivityComponent::class)
+class PingRepository @Inject constructor(@ActivityContext var context: Context) {
 
     fun ping(command: String) = flow {
         /*

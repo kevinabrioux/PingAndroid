@@ -2,20 +2,17 @@ package com.ping.android
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.ping.android.architecture.ViewRenderer
 import com.ping.android.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), ViewRenderer<StartingState> {
 
-    private val viewModel by lazy {
-        ViewModelProviders.of(
-            this,
-            MainActivityViewModelFactory(this)
-        ).get(MainActivityViewModel::class.java)
-    }
+    private val viewModel by lazy { ViewModelProvider(this).get(MainActivityViewModel::class.java) }
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
@@ -28,9 +25,7 @@ class MainActivity : AppCompatActivity(), ViewRenderer<StartingState> {
 
     override fun render(state: StartingState) {
         with(state) {
-            this@MainActivity.binding?.ping?.text = this.ping
+            this@MainActivity.binding.ping.text = this.ping
         }
     }
-
-
 }
