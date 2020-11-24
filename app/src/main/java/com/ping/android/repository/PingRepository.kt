@@ -4,10 +4,15 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import com.ping.android.application.PingApplication
+import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.lang.Thread.sleep
 import java.net.InetAddress
@@ -15,27 +20,20 @@ import java.net.Socket
 import java.net.URL
 import javax.inject.Inject
 
+interface PingRepositoryInterface {
+    suspend fun ping(command: String) : Flow<PingRepository.Ping?>
+}
 
 @Module
-@InstallIn(ActivityComponent::class)
-class PingRepository @Inject constructor(@ActivityContext var context: Context) {
+@InstallIn(ActivityRetainedComponent::class)
+interface PingModule {
+    @Binds
+    fun bindPingRepository(impl: PingRepository) : PingRepositoryInterface
+}
 
-    fun ping(command: String) = flow {
-        /*
-        while (true) {
-            val process: Process = Runtime.getRuntime().exec(command)
-            val stdInput = BufferedReader(InputStreamReader(process.inputStream))
-            var s: String? = ""
-            var res = ""
-            do {
-                s = stdInput.readLine()
-                res += s + "\n"
-            } while (s != null)
-            process.destroy()
-            Log.d("PING", res)
-            emit(res)
-            sleep(500)
-        }*/
+class PingRepository @Inject constructor(@ApplicationContext var context: Context): PingRepositoryInterface {
+
+    override suspend fun ping(command: String) = flow {
         while (true) {
             val ping = ping(URL("https://www.google.com:443/"), context)
             emit(ping)
@@ -43,7 +41,6 @@ class PingRepository @Inject constructor(@ActivityContext var context: Context) 
             sleep(500)
         }
     }
-
 
     class Ping {
         var net: String? = "NO_CONNECTION"
